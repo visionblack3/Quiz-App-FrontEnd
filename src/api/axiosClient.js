@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Set VITE_API_BASE_URL in a .env file to point at your Spring Boot backend.
 // Defaults to localhost:8080, the standard Spring Boot dev port.
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+const baseURL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 const axiosClient = axios.create({
   baseURL,
