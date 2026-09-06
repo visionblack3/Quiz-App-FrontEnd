@@ -3,6 +3,10 @@
     {
       "source": "/api/:path*",
       "destination": "http://myquizapp.ddns.net:8080/api/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
