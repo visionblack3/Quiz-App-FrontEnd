@@ -1,19 +1,19 @@
 import axiosClient from './axiosClient';
 
-// POST /api/users/register  (User body: username, email, password)
+// POST /api/users/register
 export const registerUser = (payload) =>
-  axiosClient.post('/api/users/register', payload).then((res) => res.data);
+  axiosClient.post('/users/register', payload).then((res) => res.data);
 
-// POST /api/users/login  (User body: username, password) -> LoginResponse
+// POST /api/users/login
 export const loginUser = ({ username, password }) =>
-  axiosClient.post('/api/users/login', { username, password }).then((res) => res.data);
+  axiosClient.post('/users/login', { username, password }).then((res) => res.data);
 
-// POST /api/users/forgot-password  (ForgotPasswordRequest: email)
+// POST /api/users/forgot-password
 export const forgotPassword = (email) =>
-  axiosClient.post('/api/users/forgot-password', { email }).then((res) => res.data);
+  axiosClient.post('/users/forgot-password', { email }).then((res) => res.data);
 
-// POST /api/users/reset-password  (ResetPasswordRequest: email, otp, newPassword)
+// POST /api/users/reset-password
 export const resetPassword = ({ email, otp, newPassword }) =>
   axiosClient
-    .post('/api/users/reset-password', { email, otp, newPassword })
+    .post('/users/reset-password', { email, otp, newPassword })
     .then((res) => res.data);
