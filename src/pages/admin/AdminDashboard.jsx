@@ -11,6 +11,7 @@ export default function AdminDashboard() {
 
   const load = async () => {
     setLoading(true);
+    setError('');
     try {
       setQuizzes(await getAllQuizzes());
     } catch (err) {
@@ -27,6 +28,7 @@ export default function AdminDashboard() {
   const onDelete = async (quiz) => {
     if (!window.confirm(`Delete "${quiz.title}"? This removes its questions and options too.`)) return;
     setDeletingId(quiz.id);
+    setError('');
     try {
       await deleteQuiz(quiz.id);
       setQuizzes((prev) => prev.filter((q) => q.id !== quiz.id));
