@@ -1,46 +1,45 @@
 import axiosClient from './axiosClient';
 
-// GET /api/quizzes -> Quiz[]
+// GET /api/quizzes
 export const getAllQuizzes = () =>
-  axiosClient.get('/api/quizzes').then((res) => res.data);
+  axiosClient.get('/quizzes').then((res) => res.data);
 
-// GET /api/quizzes/{id} -> Quiz (with nested questions/options)
+// GET /api/quizzes/{id}
 export const getQuizById = (id) =>
-  axiosClient.get(`/api/quizzes/${id}`).then((res) => res.data);
+  axiosClient.get(`/quizzes/${id}`).then((res) => res.data);
 
-// POST /api/quizzes/create/{creatorId} -> Quiz  (Admin only, enforced server-side)
+// POST /api/quizzes/create/{creatorId}
 export const createQuiz = (creatorId, quiz) =>
-  axiosClient.post(`/api/quizzes/create/${creatorId}`, quiz).then((res) => res.data);
+  axiosClient.post(`/quizzes/create/${creatorId}`, quiz).then((res) => res.data);
 
-// PUT /api/quizzes/{quizId} -> Quiz. Sending a full `questions` array replaces
-// the existing question/option set (server clears + re-saves via orphanRemoval).
+// PUT /api/quizzes/{quizId}
 export const updateQuiz = (quizId, quiz) =>
-  axiosClient.put(`/api/quizzes/${quizId}`, quiz).then((res) => res.data);
+  axiosClient.put(`/quizzes/${quizId}`, quiz).then((res) => res.data);
 
 // DELETE /api/quizzes/{quizId}
 export const deleteQuiz = (quizId) =>
-  axiosClient.delete(`/api/quizzes/${quizId}`).then((res) => res.data);
+  axiosClient.delete(`/quizzes/${quizId}`).then((res) => res.data);
 
-// POST /api/quizzes/{quizId}/questions -> add a single question to an existing quiz
+// POST /api/quizzes/{quizId}/questions
 export const addQuestionToQuiz = (quizId, question) =>
-  axiosClient.post(`/api/quizzes/${quizId}/questions`, question).then((res) => res.data);
+  axiosClient.post(`/quizzes/${quizId}/questions`, question).then((res) => res.data);
 
-// PUT /api/quizzes/questions/{questionId} -> update a single question + its options
+// PUT /api/quizzes/questions/{questionId}
 export const updateQuestion = (questionId, question) =>
-  axiosClient.put(`/api/quizzes/questions/${questionId}`, question).then((res) => res.data);
+  axiosClient.put(`/quizzes/questions/${questionId}`, question).then((res) => res.data);
 
-// DELETE /api/quizzes/questions/{questionId} -> remove one question
+// DELETE /api/quizzes/questions/{questionId}
 export const deleteQuestion = (questionId) =>
-  axiosClient.delete(`/api/quizzes/questions/${questionId}`).then((res) => res.data);
+  axiosClient.delete(`/quizzes/questions/${questionId}`).then((res) => res.data);
 
-// POST /api/quizzes/{id}/submit  (SubmissionRequest: submissionType, selectedAnswers) -> ResultResponse
+// POST /api/quizzes/{id}/submit
 export const submitQuiz = (quizId, submission) =>
-  axiosClient.post(`/api/quizzes/${quizId}/submit`, submission).then((res) => res.data);
+  axiosClient.post(`/quizzes/${quizId}/submit`, submission).then((res) => res.data);
 
-// GET /api/quizzes/my-scores -> QuizScoreSummaryDTO[] for the authenticated user
+// GET /api/quizzes/my-scores
 export const getMyScores = () =>
-  axiosClient.get('/api/quizzes/my-scores').then((res) => res.data);
+  axiosClient.get('/quizzes/my-scores').then((res) => res.data);
 
-// GET /api/quizzes/user/{userId}/scores -> QuizScoreSummaryDTO[]
+// GET /api/quizzes/user/{userId}/scores
 export const getUserScores = (userId) =>
-  axiosClient.get(`/api/quizzes/user/${userId}/scores`).then((res) => res.data);
+  axiosClient.get(`/quizzes/user/${userId}/scores`).then((res) => res.data);
