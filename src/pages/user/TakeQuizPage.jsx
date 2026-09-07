@@ -14,8 +14,15 @@ export default function TakeQuizPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [secondsLeft, setSecondsLeft] = useState(0);
+
   const totalSecondsRef = useRef(0);
   const submittedRef = useRef(false);
+  const answersRef = useRef(answers);
+
+  // Keep answersRef up to date without re-triggering callbacks
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
 
   useEffect(() => {
     (async () => {
@@ -39,26 +46,27 @@ export default function TakeQuizPage() {
       submittedRef.current = true;
       setSubmitting(true);
       try {
-        const result = await submitQuiz(id, { submissionType, selectedAnswers: answers });
-        navigate(`/quiz/${id}/result`, { state: { result, quiz, selectedAnswers: answers } });
+        const currentAnswers = answersRef.current;
+        const result = await submitQuiz(id, { submissionType, selectedAnswers: currentAnswers });
+        navigate(`/quiz/${id}/result`, { state: { result, quiz, selectedAnswers: currentAnswers } });
       } catch (err) {
         setError(err.message || 'Could not submit the quiz.');
         submittedRef.current = false;
         setSubmitting(false);
       }
     },
-    [answers, id, navigate, quiz]
+    [id, navigate, quiz]
   );
 
-  // Countdown ticker
+  // Countdown timer ticker
   useEffect(() => {
     if (!quiz || submittedRef.current) return undefined;
     if (secondsLeft <= 0) {
       doSubmit('TIMEOUT');
       return undefined;
     }
-    const t = setTimeout(() => setSecondsLeft((s) => s - 1), 1000);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setSecondsLeft((s) => s - 1), 1000);
+    return () => clearTimeout(timer);
   }, [quiz, secondsLeft, doSubmit]);
 
   const selectOption = (questionId, optionId) => {
