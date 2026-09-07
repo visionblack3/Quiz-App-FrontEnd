@@ -12,17 +12,22 @@ function blankOption() {
 }
 
 function blankQuestion() {
-  return { _key: nextKey(), questionText: '', options: [blankOption(), blankOption()] };
+  // Pre-select first option as correct by default
+  const opt1 = blankOption();
+  opt1.isCorrect = true;
+  return { _key: nextKey(), questionText: '', options: [opt1, blankOption()] };
 }
 
-// Strip client-only fields and drop empty ids so new items aren't sent with a fake id.
 function toPayload(questions) {
   return questions.map((q) => {
-    const question = { questionText: q.questionText, options: q.options.map((o) => ({
-      optionText: o.optionText,
-      isCorrect: !!o.isCorrect,
-      ...(o.id ? { id: o.id } : {}),
-    })) };
+    const question = {
+      questionText: q.questionText,
+      options: q.options.map((o) => ({
+        optionText: o.optionText,
+        isCorrect: !!o.isCorrect,
+        ...(o.id ? { id: o.id } : {}),
+      })),
+    };
     if (q.id) question.id = q.id;
     return question;
   });
@@ -87,9 +92,16 @@ export default function QuizEditorPage() {
 
   const removeOption = (qKey, oKey) =>
     setQuestions((prev) =>
-      prev.map((q) =>
-        q._key === qKey ? { ...q, options: q.options.filter((o) => o._key !== oKey) } : q
-      )
+      prev.map((q) => {
+        if (q._key !== qKey) return q;
+        const remainingOptions = q.options.filter((o) => o._key !== oKey);
+        // Ensure at least one option is correct if the correct option was deleted
+        const hasCorrect = remainingOptions.some((o) => o.isCorrect);
+        if (!hasCorrect && remainingOptions.length > 0) {
+          remainingOptions[0].isCorrect = true;
+        }
+        return { ...q, options: remainingOptions };
+      })
     );
 
   const updateOptionText = (qKey, oKey, text) =>
@@ -112,7 +124,7 @@ export default function QuizEditorPage() {
 
   const validate = () => {
     if (!title.trim()) return 'Give the quiz a title.';
-    if (!timeLimitMinutes || timeLimitMinutes <= 0) return 'Time limit must be greater than 0.';
+    if (!timeLimitMinutes || Number(timeLimitMinutes) <= 0) return 'Time limit must be greater than 0.';
     if (questions.length === 0) return 'Add at least one question.';
     for (const q of questions) {
       if (!q.questionText.trim()) return 'Every question needs text.';
@@ -132,12 +144,20 @@ export default function QuizEditorPage() {
       return;
     }
     setSaving(true);
-    const payload = { title, description, timeLimitMinutes: Number(timeLimitMinutes), questions: toPayload(questions) };
+
+    const userId = user?.userId || user?.id;
+    const payload = {
+      title,
+      description,
+      timeLimitMinutes: Number(timeLimitMinutes),
+      questions: toPayload(questions),
+    };
+
     try {
       if (isEditing) {
         await updateQuiz(id, payload);
       } else {
-        await createQuiz(user.userId, payload);
+        await createQuiz(userId, payload);
       }
       navigate('/admin');
     } catch (err) {
