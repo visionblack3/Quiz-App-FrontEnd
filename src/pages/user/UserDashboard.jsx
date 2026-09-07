@@ -6,7 +6,7 @@ import Loader from '../../components/Loader';
 export default function UserDashboard() {
   const navigate = useNavigate();
   const [quizzes, setQuizzes] = useState([]);
-  const [completedTitles, setCompletedTitles] = useState(new Set());
+  const [completedQuizIds, setCompletedQuizIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -15,7 +15,9 @@ export default function UserDashboard() {
       try {
         const [quizList, scores] = await Promise.all([getAllQuizzes(), getMyScores()]);
         setQuizzes(quizList);
-        setCompletedTitles(new Set(scores.map((s) => s.quizTitle)));
+        // Track completed quizzes by quizId (fallback to quizTitle if quizId not in DTO)
+        const ids = new Set(scores.map((s) => s.quizId || s.quizTitle));
+        setCompletedQuizIds(ids);
       } catch (err) {
         setError(err.message || 'Could not load quizzes.');
       } finally {
@@ -44,7 +46,7 @@ export default function UserDashboard() {
         </div>
       ) : (
         quizzes.map((quiz) => {
-          const done = completedTitles.has(quiz.title);
+          const done = completedQuizIds.has(quiz.id) || completedQuizIds.has(quiz.title);
           return (
             <div key={quiz.id} className={`quiz-card card ${done ? 'status-done' : 'status-new'}`}>
               <div className="quiz-card-main">
