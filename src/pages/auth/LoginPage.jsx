@@ -1,13 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, isAuthenticated, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Auto-redirect if already logged in
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(isAdmin ? '/admin' : '/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, isAdmin, navigate]);
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -17,8 +24,8 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const user = await login(form.username, form.password);
-      const isAdmin = user.role === 'ADMIN' || user.role === 'ROLE_ADMIN';
-      navigate(isAdmin ? '/admin' : '/dashboard');
+      const userIsAdmin = user.role === 'ADMIN' || user.role === 'ROLE_ADMIN';
+      navigate(userIsAdmin ? '/admin' : '/dashboard');
     } catch (err) {
       setError(err.message || 'Username or password wrong');
     } finally {
@@ -31,7 +38,6 @@ export default function LoginPage() {
       <div className="auth-card">
         <span className="auth-eyebrow">Testbench</span>
         <h1>Sign in</h1>
-        {/* <p>Take assessments or manage your quiz bank.</p> */}
 
         {error && <div className="alert alert-error">{error}</div>}
 
